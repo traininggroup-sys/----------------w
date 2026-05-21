@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="ar">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>اختبار إلكتروني</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        font-weight: 900;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      #login-container {
+        max-width: 400px;
+        margin: 100px auto;
+        padding: 30px;
+        background-color: #ffffff;
+        border: 2px solid #007bff;
+        border-radius: 15px;
+        box-shadow: 0 5px 25px rgba(0, 123, 255, 0.2);
+        text-align: center;
+        transition: all 0.3s ease-in-out;
+      }
+
+      #login-container label {
+        display: block;
+        font-size: 18px;
+        color: #333;
+        margin-bottom: 8px;
+        text-align: right;
+      }
+
+      #login-container input {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 20px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        box-sizing: border-box;
+      }
+
+      #login-container button {
+        width: 100%;
+        background-color: #007bff;
+        color: white;
+        padding: 12px 0;
+        font-size: 18px;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      #login-container button:hover {
+        background-color: #0056b3;
+      }
+
+      #result {
+        margin-top: 20px;
+        text-align: right;
+      }
+
+      #timer {
+        font-size: 20px;
+        color: red;
+        font-weight: bold;
+      }
+
+      h2 {
+        font-size: 22px;
+        font-weight: 900;
+        color: #000000;
+      }
+
+      label {
+        font-size: 18px;
+        font-weight: 900;
+        color: #333333;
+      }
+
+      #next-button {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        padding: 12px 25px;
+        font-weight: 900;
+        z-index: 999;
+      }
+      #quizForm {
+        padding-bottom: 100px;
+      }
+      .correct-answer {
+        color: green;
+        font-weight: 900;
+      }
+
+      .wrong-answer {
+        color: red;
+        font-weight: 900;
+      }
+
+      ul {
+        list-style-type: none;
+        padding: 0;
+      }
+
+      ul li {
+        margin-bottom: 15px;
+        background-color: #f0f4f8;
+        padding: 10px;
+        border-radius: 6px;
+        font-weight: 900;
+        color: #000;
+        font-size: 18px;
+      }
+
+      #result h2,
+      #result h3,
+      #result p {
+        font-weight: 900;
+        color: #000;
+        font-size: 18px;
+        text-align: right;
+      }
+
+      #retry-button {
+        padding: 10px 20px;
+        font-weight: bold;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 20px;
+      }
+
+      label[lang="en"] {
+        direction: ltr;
+        text-align: left;
+        display: block;
+        margin-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>التدريب علي اختبارات الجهاز المركزى</h2>
+
+    <div id="login-container">
+      <label for="password">🔒 أدخل كلمة المرور:</label>
+      <input id="password" type="password" placeholder="مثال: 12345678" />
+      <label for="duration">⏳ حدد مدة الاختبار (بالدقائق):</label>
+      <input id="duration" type="number" value="5" min="1" />
+      <button onclick="checkPassword()">🚀 دخول</button>
+    </div>
+
+    <div class="hidden" id="quiz">
+      <div id="timer">5:00</div>
+      <div id="question-info">السؤال 1 من 20</div>
+      <form id="quizForm">
+        <div id="question-container"></div>
+        <button id="next-button" onclick="nextQuestion(event)" type="button">
+          التالي
+        </button>
+      </form>
+    </div>
+
+    <div class="hidden" id="result"></div>
+
+    <script>
+      const questions = [
+        {
+          question:
+            'Ali said ....... "The results are better than we expected".',
+          options: ["Colon", "Semicolon", "Comma", "Hyphen"],
+          answer: "Colon",
+        },
+        {
+          question: "Which of the following is a transitive verb?",
+          options: ["Cry", "Sleep", "Read", "Arrive"],
+          answer: "Read",
+        },
+        {
+          question: "A pack of wolves __________ hunting in the forest.",
+          options: ["is", "are", "was", "be"],
+          answer: "is",
+        },
+        {
+          question:
+            "If you want to escape from the noise of the city, go to the __________.",
+          options: ["Skyscraper", "Countryside", "Downtown", "Highway"],
+          answer: "Countryside",
+        },
+
+        {
+          question: "Have you finished your drink __________? You look hungry!",
+          options: ["yet", "already", "since", "ever"],
+          answer: "already",
+        },
+        {
+          question: "The play was a __________; the audience laughed a lot.",
+          options: ["Typing", "Playwriting", "Acting", "Comedy"],
+          answer: "Comedy",
+        },
+        {
+          question: "The ball rolled __________ the stairs.",
+          options: ["up", "down", "over", "through"],
+          answer: "down",
+        },
+        {
+          question: "The audience ________ enjoying the performance.",
+          options: ["is", "are", "were", "have"],
+          answer: "are",
+        },
+        {
+          question: "The internet has made the world a __________ place.",
+          options: ["single", "small", "large", "isolated"],
+          answer: "small",
+        },
+        {
+          question: "The teacher provided clear __________ on the assignment.",
+          options: ["Direction", "Directors", "Directions", "Directives"],
+          answer: "Directions",
+        },
+        {
+          question:
+            "The hotel offers true Italian __________ prepared by top chefs.",
+          options: ["Meals", "Foods", "Kitchens", "Cuisine"],
+          answer: "Cuisine",
+        },
+        {
+          question: 'Synonym of "Skillful/Outstanding":',
+          options: ["Monotonous", "Proficient", "Tedious", "Repetitive"],
+          answer: "Proficient",
+        },
+        {
+          question: 'Synonym of "Monotonous":',
+          options: ["Exciting", "Dull", "Varied", "Dynamic"],
+          answer: "Dull",
+        },
+        {
+          question: 'Synonym of "Summit":',
+          options: ["Bottom", "Peak", "Valley", "Base"],
+          answer: "Peak",
+        },
+        {
+          question: 'Synonym of "Plateau":',
+          options: ["Mountain", "Tableland", "Hole", "Summit"],
+          answer: "Tableland",
+        },
+        {
+          question: 'Synonym of "Grateful":',
+          options: ["Careful", "Thankful", "Cheerful", "Useful"],
+          answer: "Thankful",
+        },
+        {
+          question: "She insisted that he __________ the truth.",
+          options: ["tell", "tells", "telling", "told"],
+          answer: "tell",
+        },
+        {
+          question: "He encouraged us __________ our best.",
+          options: ["do", "to do", "doing", "did"],
+          answer: "to do",
+        },
+        {
+          question: "Neither the dog nor the cats __________ hungry.",
+          options: ["is", "are", "being", "was"],
+          answer: "are",
+        },
+        {
+          question:
+            "The suit price is terrible; I will buy a __________ instead.",
+          options: ["bad", "sock", "worse", "ugly"],
+          answer: "sock",
+        },
+        {
+          question: "I am bored. How about ____ to the cinema tonight?",
+          options: ["go", "goes", "going", "went"],
+          answer: "going",
+        },
+        {
+          question:
+            "The manager suggested that everyone ______ the meeting on time tomorrow.",
+          options: ["attends", "attend", "attending", "to attend"],
+          answer: "attend",
+        },
+        {
+          question: "He suggests that she ______ with us.",
+          options: ["go", "goes", "going", "went"],
+          answer: "go",
+        },
+        {
+          question: "I am studying for the exam to be the first.",
+          options: ["Studies", "am studying", "was study", "study"],
+          answer: "am studying",
+        },
+        {
+          question: "Which method is better for developing reading skill?",
+          options: ["Silent way", "Loud way"],
+          answer: "Silent way",
+        },
+        {
+          question: "The bird lives ______ the branch.",
+          options: ["at", "in", "on", "for"],
+          answer: "on",
+        },
+        {
+          question: "The train arrived ______ the station ______ time.",
+          options: ["in, on", "at, in", "over, with", "at, on"],
+          answer: "at, on",
+        },
+        {
+          question: "We enjoyed listening to the orchestra at the ______.",
+          options: ["kitchen", "opera", "factory", "airport"],
+          answer: "opera",
+        },
+        {
+          question: "Which of these items uses dough and has a brown color?",
+          options: ["Bread", "Milk", "Water", "Rice"],
+          answer: "Bread",
+        },
+        {
+          question: "Which word is a subordinating conjunction?",
+          options: ["But", "And", "Or", "Because"],
+          answer: "Because",
+        },
+        {
+          question:
+            'What type of sentence is this? "Bring these books, pens, and notebooks."',
+          options: [
+            "Simple sentence",
+            "Compound sentence",
+            "Complex sentence",
+            "Compound-complex sentence",
+          ],
+          answer: "Simple sentence",
+        },
+
+        {
+          question: "I like her __________ for fashion; she is very stylish.",
+          options: ["feel", "taste", "smell"],
+          answer: "taste",
+        },
+      ];
+
+      let currentQuestion = 0;
+      let score = 0;
+      let timer;
+      let timeLeft;
+      let userAnswers = [];
+
+      function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+      }
+
+      function shuffleQuestions() {
+        shuffle(questions);
+        questions.forEach((q) => shuffle(q.options));
+      }
+
+      function checkPassword() {
+        const passwordInput = document.getElementById("password").value;
+        const durationInput =
+          parseInt(document.getElementById("duration").value) || 10;
+        timeLeft = durationInput * 60;
+
+        if (passwordInput === "27") {
+          shuffleQuestions();
+          document.getElementById("login-container").classList.add("hidden");
+          document.getElementById("quiz").classList.remove("hidden");
+          document.getElementById("result").classList.add("hidden");
+          currentQuestion = 0;
+          score = 0;
+          userAnswers = [];
+          loadQuestion();
+          startTimer();
+        } else {
+          alert("🚫 المحاولة غير صحيحة! تأكد من كتابة كلمة السر بشكل دقيق.");
+        }
+      }
+
+      function loadQuestion() {
+        const questionContainer = document.getElementById("question-container");
+        questionContainer.innerHTML = `
+    <h2 lang="en" dir="ltr">${questions[currentQuestion].question}</h2>
+    ${questions[currentQuestion].options
+      .map(
+        (option) => `
+      <label lang="en" dir="ltr">
+        <input type="radio" name="option" value="${option}" />
+        ${option}
+      </label><br>
+    `,
+      )
+      .join("")}
+  `;
+        document.getElementById("question-info").textContent = `السؤال ${
+          currentQuestion + 1
+        } من ${questions.length}`;
+      }
+
+      function nextQuestion(event) {
+        event.preventDefault();
+        const selected = document.querySelector('input[name="option"]:checked');
+        if (!selected) return alert("اختر إجابة.");
+        userAnswers[currentQuestion] = selected.value;
+        if (selected.value === questions[currentQuestion].answer) score++;
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+          loadQuestion();
+        } else {
+          clearInterval(timer);
+          showResults();
+        }
+      }
+
+      function showResults(timeUp = false) {
+        document.getElementById("quiz").classList.add("hidden");
+        const resultDiv = document.getElementById("result");
+        resultDiv.classList.remove("hidden");
+
+        const percent = ((score / questions.length) * 100).toFixed(1);
+
+        let feedback = "";
+        if (percent == 100) {
+          feedback = "أنت بطل! برافو عليك 👏";
+        } else if (percent >= 80) {
+          feedback = "ممتاز! واضح إنك مذاكر كويس 💪";
+        } else if (percent >= 60) {
+          feedback = "كويس، بس محتاج تراجع شوية 🙂";
+        } else if (percent >= 40) {
+          feedback = "راجع الدروس تاني وحاول تركز أكتر 📚";
+        } else {
+          feedback = "ابدأ من الأول وراجع كويس، شد حيلك! 💡";
+        }
+
+        let warningMsg = "";
+        if (timeUp && currentQuestion < questions.length) {
+          warningMsg = `
+        <p style="color: red;">⏰ انتهى الوقت قبل إكمال جميع الأسئلة.</p>
+        <p>في المرة الجاية حاول تحل الأسئلة بشكل أسرع علشان تلحق تكمل 💡</p>
+      `;
+        }
+
+        let review = "<h3>مراجعة الإجابات:</h3><ul>";
+        questions.forEach((q, i) => {
+          const ua = userAnswers[i] || "لم يُجب";
+          const correct = q.answer;
+          const isCorrect = ua === correct;
+          review += `
+        <li>
+          <strong>السؤال ${i + 1}:</strong> ${q.question}<br>
+          إجابتك: <span class="${
+            isCorrect ? "correct-answer" : "wrong-answer"
+          }">${ua}</span><br>
+          الإجابة الصحيحة: <span class="correct-answer">${correct}</span><br>
+          <strong>التفسير:</strong> ${q.explanation || "لا يوجد تفسير."}
+        </li>
+      `;
+        });
+        review += "</ul>";
+
+        resultDiv.innerHTML = `
+      ${warningMsg}
+      <h2>نتيجة الاختبار</h2>
+      <p>${score} من ${questions.length} | النسبة: ${percent}%</p>
+      <p>${feedback}</p>
+      ${review}
+      <button id="retry-button" onclick="location.reload()">إعادة المحاولة</button>
+    `;
+      }
+
+      function startTimer() {
+        timer = setInterval(() => {
+          timeLeft--;
+          const minutes = Math.floor(timeLeft / 60);
+          const seconds = timeLeft % 60;
+          document.getElementById("timer").textContent = `${minutes}:${
+            seconds < 10 ? "0" : ""
+          }${seconds}`;
+          if (timeLeft <= 0) {
+            clearInterval(timer);
+            alert("انتهى الوقت!");
+            showResults(true);
+          }
+        }, 1000);
+      }
+
+      document
+        .getElementById("quizForm")
+        .addEventListener("keypress", function (event) {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            nextQuestion(event);
+          }
+        });
+    </script>
+  </body>
+</html>
